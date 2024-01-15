@@ -20,14 +20,14 @@ class AuthController extends Controller
     public function __construct()
     {
         //$this->middleware('auth:api');
-         $this->middleware('JWT', ['except' => ['login','signup','me']]);
-       // $this->middleware('JWT', ['except' => ['login','signup','me','checkToken']]);
+        $this->middleware('JWT', ['except' => ['login', 'signup', 'me']]);
+        // $this->middleware('JWT', ['except' => ['login','signup','me','checkToken']]);
     }
     //, ['except' => ['login','signup']]
     /**
      * Get a JWT via given credentials.
      *
-      * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
@@ -38,7 +38,7 @@ class AuthController extends Controller
 
         $credentials = request(['username', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Email or Password Invalid'], 401);
         }
 
@@ -54,7 +54,7 @@ class AuthController extends Controller
     {
         return response()->json(auth()->user());
     }
-    
+
 
     /**
      * Log the user out (Invalidate the token).
@@ -98,7 +98,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function signup(Request $request){
+    public function signup(Request $request)
+    {
         $validateData = $request->validate([
             'email' => 'required|unique:users|max:255',
             'name' => 'required',
@@ -116,95 +117,94 @@ class AuthController extends Controller
 
     public function login2(Request $request)
     {
-   
-
-    date_default_timezone_set('Asia/Manila');
-	$this->validate($request, [
-		'username' => 'required',
-		'password' => 'required'
-	]);
 
 
-	$username = $request->input('username');
-	$password = $request->input('password');
+        date_default_timezone_set('Asia/Manila');
+        $this->validate($request, [
+            'username' => 'required',
+            'password' => 'required'
+        ]);
 
-	$adServer = "192.168.70.81"; //"ldap://dpotmh.local";
-	$ldap = ldap_connect($adServer, 389);
 
-	$ldaprdn = "DPOTMH" . "\\" .$username;
+        $username = $request->input('username');
+        $password = $request->input('password');
 
-	ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
-	ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+        $adServer = "192.168.70.81"; //"ldap://dpotmh.local";
+        $ldap = ldap_connect($adServer, 389);
 
-	$bind = @ldap_bind($ldap, $ldaprdn, $password);
+        $ldaprdn = "DPOTMH" . "\\" . $username;
 
-    $credentials = request(['username', 'password']);
-	if($bind) {
-		//get local db data
-        $checkUser = User::where(["username"=>$request->username])->first();
-        if (!$checkUser) {  
+        ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
 
-            $idno = $request->username;
-            $ldap_users = array(
-				'ftfuentes'=>'006240',
-				'cfgarcia' =>'006237',
-				'rcmoncatar' => '006342',
-				'rmpesca' => '006369',	
-                'jmdquiatchon' => '006593',
-				'jclucasan' => '006563',
-			);
+        $bind = @ldap_bind($ldap, $ldaprdn, $password);
 
-            if(array_key_exists($idno, $ldap_users)) {
-                $idno =  $ldap_users[$idno];
-            }
-            
-            $communicator_data = DB::connection('communicator')->select("select u.*, d.department_name from users u left join 
+        $credentials = request(['username', 'password']);
+        if ($bind) {
+            //get local db data
+            $checkUser = User::where(["username" => $request->username])->first();
+            if (!$checkUser) {
+
+                $idno = $request->username;
+                $ldap_users = array(
+                    'ftfuentes' => '006240',
+                    'cfgarcia' => '006237',
+                    'rcmoncatar' => '006342',
+                    'rmpesca' => '006369',
+                    'jmdquiatchon' => '006593',
+                    'jclucasan' => '006563',
+                );
+
+                if (array_key_exists($idno, $ldap_users)) {
+                    $idno = $ldap_users[$idno];
+                }
+
+                $communicator_data = DB::connection('communicator')->select("select u.*, d.department_name from users u left join 
             department d on u.department = d.department_id where u.id_number = '$idno'");
                 $user = new User;
-                $user->name = ucwords($communicator_data[0]->firstname.' '.$communicator_data[0]->lastname);
-                $user->email = $request->username.'@rivermedcenter.com';
+                $user->name = ucwords($communicator_data[0]->firstname . ' ' . $communicator_data[0]->lastname);
+                $user->email = $request->username . '@rivermedcenter.com';
                 $user->username = $request->username;
                 $user->password = Hash::make($request->password);
                 $user->save();
                 $token = auth()->attempt($credentials);
 
                 $user = new Logs;
-                $user->idno =  $idno;
-                $user->name =  ucwords($communicator_data[0]->firstname.' '.$communicator_data[0]->lastname);;
-                $user->ipaddress = $request->ip();//Request::ip();
-                $user->date_attemp =  date("Y-m-d H:i:s");
+                $user->idno = $idno;
+                $user->name = ucwords($communicator_data[0]->firstname . ' ' . $communicator_data[0]->lastname);
+                ;
+                $user->ipaddress = $request->ip(); //Request::ip();
+                $user->date_attemp = date("Y-m-d H:i:s");
                 $user->save();
-        }else{
-            $token = auth()->attempt($credentials);
+            } else {
+                $token = auth()->attempt($credentials);
 
-            $user = new Logs;
-            $user->idno =  $checkUser->username;
-            $user->name =  $checkUser->name;
-            $user->ipaddress = $request->ip();
-            $user->date_attempt =  date("Y-m-d H:i:s");
-            $user->save();
+                $user = new Logs;
+                $user->idno = $checkUser->username;
+                $user->name = $checkUser->name;
+                $user->ipaddress = $request->ip();
+                $user->date_attempt = date("Y-m-d H:i:s");
+                $user->save();
+            }
+            @ldap_close($ldap);
+            return $this->respondWithToken($token);
+        } else {
+            @ldap_close($ldap);
+            //return redirect('/')->with('error','Invalid Username and Password Combination');
+            return response()->json(['message' => 'User not found1.'], 401);
         }
-		@ldap_close($ldap);
-        return $this->respondWithToken($token);			
-	}
-		
-     else {
-		@ldap_close($ldap);
-		//return redirect('/')->with('error','Invalid Username and Password Combination');
-        return response()->json(['message' => 'User not found1.'], 401);
-	}
 
-}
-public function checkToken(Request $request)
-{
-    try {
-    $user = auth()->guard('api')->user();
-    if (!$user) {
-        throw new \Exception('Unauthorized');
     }
-    return response()->json(['message' => 'Token is valid']);
-    } catch (\Exception $e) {
-    return response()->json(['message' => 'Token is invalid'], 401);
+    public function checkToken(Request $request)
+    {
+        try {
+            $user = auth()->guard('api')->user();
+            if (!$user) {
+                throw new \Exception('Unauthorized');
+            }
+            return response()->json(['message' => 'Token is valid']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Token is invalid'], 401);
+        }
     }
-}
 }

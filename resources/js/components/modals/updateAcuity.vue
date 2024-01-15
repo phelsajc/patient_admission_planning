@@ -4,9 +4,14 @@
       <div class="modal-wrapper">
         <div class="modal-container">
           <div class="modal-header">
-            <slot name="header" v-if="patientid==0">Add Session</slot>
-            <slot name="header" v-else>Edit Session</slot>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="$emit('close')">
+            <slot name="header">Update Data</slot>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              @click="$emit('close')"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -15,20 +20,31 @@
               <form class="user" @submit.prevent="save" enctype="multipart/form-data">
                 <div class="card-body">
                   <div class="form-group">
-                    <label>Patient: {{ patient.patient }} </label>
-                  </div>                  
-                  <div class="form-group">
-                    <label>Registry Date: {{ patient.registrydt }} </label>
+                    <label>Station: {{ data.station }} </label>
+                  </div>   
+                  <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-1 col-form-label"
+                      >Reservation</label
+                    >
+                    <div class="col-sm-2">
+                      <input
+                        v-model="form.reservation"
+                        type="text"
+                        class="form-control"
+                        placeholder="Reservation"
+                      />
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label>Acuity Level</label>
-                    <select class="form-control" v-model="form.acuity">
-                      <option selected value="0">None</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                    </select>
+                  <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-1 col-form-label">ER</label>
+                    <div class="col-sm-2">
+                      <input
+                        v-model="form.er"
+                        type="text"
+                        class="form-control"
+                        placeholder="ER"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div class="card-footer">
@@ -41,140 +57,62 @@
       </div>
     </div>
   </transition>
-</template> 
+</template>
 <script>
-import Datepicker from 'vuejs-datepicker';
-//import api from '../../Helpers/api';
+import Datepicker from "vuejs-datepicker";
 export default {
   props: {
-    patient: {
-            type: Array(),
-            default: {}
-        },
-        doctorId: {
-            type: Number,
-            default: 0
-        },
-        scheduleDate: {
-            type: String,
-            default: null
-        },
-        patientid: {
-            type: Number,
-            default: 0
-        },
+    dataArr: {
+      type: Array(),
+      default: {},
+    },
   },
   components: {
     Datepicker,
   },
   watch: {
-    sessionid(v) {
-      this.form.sessid = v
-    },  
-    doctorId(v) {
-      this.form.doctor = v
-    },  
-    scheduleDate(v) {
-      this.form.schedule = v
-    },
-    patientid(v) {
-      this.form.patientid = v
-    },       
+    patientid(v){
+    }
   },
-  computed:{
-  },
+  computed: {},
   created() {
- /*    this.getDoctors();    
-         api.get('patients-detail/'+this.patientid)
-        .then(response => {
-          console.log("response.data.name")
-          console.log(response.data.name)
-          return this.patientName = response.data.name
-        }).catch(error => {
-          if (error.response.data.message == 'Token has expired') {
-            this.$router.push({ name: '/' });
-            Toast.fire({
-              icon: 'error',
-              title: 'Token has expired'
-            })
-          }
-        }); */
+    
   },
   data() {
     return {
       form: {
-        acuity: null,
-        pxdetail: this.patient,
+        reservation: null,
+        er: null,
+        id: this.dataArr.id,
+        stn: this.dataArr.station,
+        occupied: this.dataArr.occupied.census,
+        mgh: this.dataArr.mgh.census,
       },
-      doctors: [],
-      results: [],
-      sessionDate: '',
-      patientName: '',
-      attendingDoctor: '',
-    }
+      data: this.dataArr,
+    };
   },
   methods: {
-    getDoctors() {
-      api.get('getDoctors')
-        .then(response => {
-          this.doctors = response.data
-        }).catch(error => {
-          if (error.response.data.message == 'Token has expired') {
-            this.$router.push({ name: '/' });
-            Toast.fire({
-              icon: 'error',
-              title: 'Token has expired'
-            })
-          }
-        });
-    },
-    autoComplete() {
-      this.results = [];
-      if (this.form.searchVal.length >= 3) {
-        api.post('patients-find', this.form)
-          .then(response => {
-            this.results = response.data
-          }).catch(error => {
-          if (error.response.data.message == 'Token has expired') {
-            this.$router.push({ name: '/' });
-            Toast.fire({
-              icon: 'error',
-              title: 'Token has expired'
-            })
-          }
-        });
-      } else {
-        this.form.patientid = 0
-      }
-    },
-    getPatient(id) {
-      this.form.patientid = id.id
-      this.form.searchVal = id.name
-      this.results = [];
-    },
     save() {
-      api.post('store-acuity', this.form)
-          .then(response => {
+      api
+        .post("update-stn-census", this.form)
+        .then((response) => {
+          Toast.fire({
+            icon: "success",
+            title: "Saved successfully",
+          });
+        })
+        .catch((error) => {
+          if (error.response.data.message == "Token has expired") {
+            this.$router.push({ name: "/" });
             Toast.fire({
-              icon: 'success',
-              title: 'Saved successfully'
+              icon: "error",
+              title: "Token has expired",
             });
-          }).catch(error => {
-          if (error.response.data.message == 'Token has expired') {
-            this.$router.push({ name: '/' });
-            Toast.fire({
-              icon: 'error',
-              title: 'Token has expired'
-            })
           }
         });
     },
-    getReturnResponse: function (data) {
-      this.form.patientid = data.id.id
-      this.attendingDoctor = data.id.doctor
-    }
   },
-}
+};
 </script>
 <style scoped>
 .container-iframe {
@@ -248,4 +186,3 @@ export default {
   transform: scale(1.1);
 }
 </style>
-  

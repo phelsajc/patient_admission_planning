@@ -21,7 +21,7 @@
                   <h3 class="card-title">&nbsp;</h3>
                 </div>
                 <div class="card-body">
-                  <form class="user" enctype="multipart/form-data">
+                  <!-- <form class="user" enctype="multipart/form-data">
                     <div class="row">
                       <div class="col-sm-2">
                         <div class="form-group">
@@ -68,33 +68,17 @@
                           >
                             Filter
                           </button>
-                          <!-- <button
-                            type="button"
-                            @click="exportCsv()"
-                            class="btn btn-primary"
-                          >
-                            Export
-                          </button>
-                          <button
-                            type="button"
-                            @click="exportPDF()"
-                            class="btn btn-danger"
-                          >
-                            PDF
-                          </button> -->
                         </div>
                       </div>
                     </div>
+                  </form> -->
 
-                    <!-- <progressBar :getStatus="showProgress"></progressBar> -->
-                  </form>
-                  
-                <dl class="row">
-                  <dt class="col-sm-2">Total Regular Beds:</dt>
-                  <dd class="col-sm-8">{{ getTotalBeds }}</dd>
-                </dl>
-                  
-                  <table class="table">
+                  <!-- <dl class="row">
+                    <dt class="col-sm-2">Total Regular Beds:</dt>
+                    <dd class="col-sm-8">{{ getTotalBeds }}</dd>
+                  </dl> -->
+
+                  <!-- <table class="table">
                     <thead>
                       <tr>
                         <th>Stations</th>
@@ -140,50 +124,74 @@
                               </td>
                             </tr>
                             <tr>
-                              <td>
-                               
-                              </td>
-                              <td>
-                              
-                              </td>
-                              <td>
-                               
-                              </td>
-                              <td>
-                              </td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
                               <td>
                                 {{ e.total }}
                               </td>
-                              <td>
-                              </td>
+                              <td></td>
                             </tr>
                           </tbody>
-
                         </table>
                       </tr>
                     </tbody>
+                  </table> -->
 
+                  <table class="table table-striped table-bordered table-sm">
+                    <!-- <thead>
+                      <th style="text-align:left" colspan="5">Date</th>
+                    </thead> -->
+                    <thead>
+                      <!-- <th>#</th> -->
+                      <th class="text-center">STN</th>
+                      <th class="text-center">LICENSED CAPACITY</th>
+                      <th class="text-center">TARGET CAPACITY</th>
+                      <th class="text-center">MANPOWER HEADCOUNT</th>
+                      <th class="text-center">FUNCTIONAL CAPACITY</th>
+                      <th class="text-center">OCCUPIED CAPACITY</th>
+                      <th class="text-center">MGH</th>
+                      <th class="text-center">RESERVATION</th>
+                      <th class="text-center">ER</th>
+                      <th class="text-center">AVAILABLE</th>
+                      <th class="text-center">RESERVED CAPACITY</th>
+                      <th class="text-center">RATIO</th>
+                      <th class="text-center">ACTION</th>
+                    </thead>
+
+                    <tbody>
+                      <tr v-for="(e, index)  in stns">
+                        <!-- <td>{{index+1}}</td> -->
+                        <td class="text-center">{{e.station}}</td>
+                        <td class="text-center">{{e.licensed}}</td>
+                        <td class="text-center">{{e.target}}</td>
+                        <td class="text-center">{{e.manpower}}</td>
+                        <td class="text-center">{{e.functional}}</td>
+                        <td class="text-center">{{e.occupied.census}}</td>
+                        <td class="text-center">{{e.mgh.census}}</td>
+                        <td class="text-center">{{e.reservation}}</td>
+                        <td class="text-center">{{e.er}}</td>
+                        <td class="text-center">{{e.available}}</td>
+                        <td class="text-center">{{e.reserved}}</td>
+                        <td class="text-center">{{e.ratio}}</td>
+                        <td>
+                          <button type="button" class="btn btn-primary" @click="updateStatus(e)">UPDATE</button>
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
-
-                  <div id="loader" :class="{ 'd-none': isHidden }"></div>
-                  <nav aria-label="Page navigation example" class="to-right">
-                    <ul class="pagination">
-                      <li class="page-item" v-for="(e, index) in this.countRecords">
-                        <a class="page-link" @click="getPageNo(index + 1)" href="#">{{
-                          index + 1
-                        }}</a>
-                      </li>
-                    </ul>
-                  </nav>
-
-                  <nav aria-label="Page navigation example" class="">
-                    {{ showing }}
-                  </nav>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <acuityLevel
+          v-if="showModal"
+          @close="showModal = false"
+          v-on:close="getStns"
+          :dataArr="passData"
+        ></acuityLevel>
       </section>
     </div>
     <footerComponent></footerComponent>
@@ -195,7 +203,6 @@ import Datepicker from "vuejs-datepicker";
 import Select2 from "v-select2-component";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
-//import api from "../../Helpers/api";
 export default {
   components: { Datepicker, Select2, Multiselect },
   created() {
@@ -203,12 +210,12 @@ export default {
       this.$router.push({ name: "/" });
     }
 
-    //Notification.success()
-    // this.allEmployee();
     this.getStns();
   },
   data() {
     return {
+      passData: [{}],
+      showModal:false,
       myOptions: ["All"],
       hasError: false,
       isHidden: true,
@@ -218,6 +225,7 @@ export default {
         fdate: null,
       },
       employees: [],
+      stns: [],
       searchTerm: "",
       countRecords: 0,
       showing: "",
@@ -233,61 +241,71 @@ export default {
     },
   },
   methods: {
-    onSelect(value){
-      if(value=="All"){
-      console.log(value)
-        this.filter.stns = []
-       this.filter.stns =['All']
-      }else{
+    onSelect(value) {
+      if (value == "All") {
+        console.log(value);
+        this.filter.stns = [];
+        this.filter.stns = ["All"];
+      } else {
         var index = this.filter.stns.indexOf("All");
         if (index !== -1) {
           this.filter.stns.splice(index, 1);
         }
       }
     },
+    updateStatus(e){
+        this.showModal = true;
+        this.passData = e;
+    },
     getStns() {
+      console.log(1)
+      this.stns = [];
       api
-        .get("/getSDtations")
+        .get("/getStations")
         .then((response) => {
           response.data.data.forEach((element) => {
-            this.myOptions.push(element.station);
+            this.stns.push(element);
           });
         })
         .catch((error) => console.log(error));
     },
     showReport() {
-      console.log(this.filter.stns.length)
+      console.log(this.filter.stns.length);
       //if(this.filter.stns.length==0&&this.filter.fdate==null&&this.filter.tdate==null){
-      if(this.filter.stns.length==0||this.filter.fdate==null||this.filter.tdate==null){
-      //if(true&&false&&false){
-        
-          Toast.fire({
-            icon: "error",
-            title: "Check fields",
-          });
-      }else{
-      console.log(111)
-      api .post("/getCensus", this.filter)
-        .then((response) => {
-          this.census_results = response.data.data;
-          this.getTotalBeds = response.data.totalRegularBed;
-          Toast.fire({
-            icon: "success",
-            title: "Saved successfully",
-          });
-          //this.progressStatus = true;
-        })
-        .catch((error) => {
-          if (error.response.data.message == "Token has expired") {
-            this.$router.push({ name: "/" });
-            Toast.fire({
-              icon: "error",
-              title: "Token has expired",
-            });
-          }
+      if (
+        this.filter.stns.length == 0 ||
+        this.filter.fdate == null ||
+        this.filter.tdate == null
+      ) {
+        //if(true&&false&&false){
+
+        Toast.fire({
+          icon: "error",
+          title: "Check fields",
         });
+      } else {
+        console.log(111);
+        api
+          .post("/getCensus", this.filter)
+          .then((response) => {
+            this.census_results = response.data.data;
+            this.getTotalBeds = response.data.totalRegularBed;
+            Toast.fire({
+              icon: "success",
+              title: "Saved successfully",
+            });
+            //this.progressStatus = true;
+          })
+          .catch((error) => {
+            if (error.response.data.message == "Token has expired") {
+              this.$router.push({ name: "/" });
+              Toast.fire({
+                icon: "error",
+                title: "Token has expired",
+              });
+            }
+          });
       }
-       
     },
     generate() {
       console.log(this.myValue);

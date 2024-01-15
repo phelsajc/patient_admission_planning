@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ER Reporting | Dashboard</title>
+    <title>Patient Admission Planning</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="{{ asset('backend2/plugins/fontawesome-free/css/all.min.css') }}">
@@ -35,26 +35,10 @@
     <script src="{{ asset('backend2/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('backend2/plugins/jqvmap/jquery.vmap.min.js') }}"></script>
     <script src="{{ asset('backend2/plugins/jqvmap/maps/jquery.vmap.usa.js') }}"></script>
-    
+
     <script src="{{ asset('backend2/plugins/summernote/summernote-bs4.min.js') }}"></script>
     <script src="{{ asset('backend2/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
     <script src="{{ asset('backend2/dist/js/adminlte.js') }}"></script>
-    {{-- <script type="text/javascript">
-        $(document).ready(function() {
-            let token = localStorage.getItem('token');
-            if (token) {
-                $("#sidebar").css("display", "");
-                $("#topbar").css("display", "");
-                $("#footer_div").css("display", "");
-                //  $("#user_name").text(localStorage.getItem('user_type'))
-                if (localStorage.getItem('user_type') != "Administrator") {
-                    $("#usermenu").addClass("d-none")
-                } else {
-                    $("#usermenu").removeClass("d-none")
-                }
-            }
-        });
-    </script> --}}
 </body>
 
 </html>

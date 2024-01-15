@@ -67,7 +67,7 @@ return [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '192.168.70.90'),
             'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'rmci_census_monitoring'),
+            'database' => env('DB_DATABASE', 'patient_admission_planning'),
             'username' => env('DB_USERNAME', 'postgres'),
             'password' => env('DB_PASSWORD', 'pgadmin888!?'),
             'charset' => 'utf8',

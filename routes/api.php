@@ -18,8 +18,8 @@ Route::group([
 
 
 
-Route::match(['get','post'],'getSDtations','CensusController@getSDtations');
-Route::match(['get','post'],'getCensus','CensusController@index');
+Route::match(['get','post'],'getStations','CensusController@getStations');
+Route::match(['get','post'],'update-stn-census','CensusController@UpdateInfo');
 Route::match(['get','post'],'er_list','CensusController@getErList');
 Route::match(['get','post'],'getEeReport','CensusController@getEeReport');
 Route::match(['get','post'],'store-acuity','CensusController@storeAcuityInfo');

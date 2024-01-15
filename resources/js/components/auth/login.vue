@@ -3,7 +3,8 @@
     <div class="login-box">
       <div class="card card-outline card-primary">
         <div class="card-header text-center">
-          <a href="javascript:void(0);" class="h1"><b>Welcome User</b></a>
+        <h2>Patient Admission Planning</h2>
+          <!-- <a href="javascript:void(0);" class="h1"><b>Welcome User</b></a> -->
         </div>
         <div class="card-body">
           <p class="login-box-msg">Sign in to start your session</p>
@@ -89,26 +90,25 @@ export default {
   },
   methods: {
     async login() {
-      await api
-      //  .post("/auth/login", this.form)
-        .post("/api/login", this.details)
+      await axios
+        .post("/api/auth/login", this.form)
         .then((res) => {
           User.responseAfterLogin(res);
-                 //   location = '/census'
+                    location = '/census'
           Toast.fire({
             icon: "success",
             title: "Signed in successfully!",
           });
-          this.$router.push({ name: "census" });
+       //   this.$router.push({ name: "census" });
         })
         .catch((error) => {
           //if (error.response.data.message == "Token has expired") {
             //this.$router.push({ name: "/" });
             console.log(error)
-            /* Toast.fire({
+            Toast.fire({
               icon: "error",
               title: error.response.data.message,
-            }); */
+            });
           //}
         });
         /* .catch((error) => (this.errors = error.response.data.errors))

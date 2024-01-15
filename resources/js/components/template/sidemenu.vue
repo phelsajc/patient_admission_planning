@@ -36,21 +36,18 @@
             </router-link>
           </li>
 
-          <li
+          <!-- <li
             class="nav-item"
             :class="{
               'menu-open':
-                this.$route.name == 'er_list' ||
-                this.$route.name == 'er_report'
+                this.$route.name == 'er_list' || this.$route.name == 'er_report',
             }"
           >
             <a
               href="#"
               class="nav-link"
               :class="{
-                active:
-                  this.$route.name == 'er_list' ||
-                  this.$route.name == 'er_report' 
+                active: this.$route.name == 'er_list' || this.$route.name == 'er_report',
               }"
             >
               <i class="nav-icon fas fa-folder-plus"></i>
@@ -63,8 +60,7 @@
                     href="#"
                     class="nav-link"
                     :class="{
-                      active:
-                        this.$route.name == 'er_list'
+                      active: this.$route.name == 'er_list',
                     }"
                   >
                     <i class="fas fa-user-injured"></i>
@@ -78,18 +74,17 @@
                     href="#"
                     class="nav-link"
                     :class="{
-                      active:
-                        this.$route.name == 'er_report' 
+                      active: this.$route.name == 'er_report',
                     }"
                   >
                     <i class="fas fa-user-md"></i>
                     Reports
                   </a></router-link
                 >
-              </li>              
+              </li>
             </ul>
           </li>
-
+ -->
           <li class="nav-item">
             <router-link to="/logout" class="nav-link">
               <p>Logout</p>

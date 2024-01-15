@@ -5,7 +5,7 @@ const apiClient = axios.create({
   //baseURL: 'https://station_census.rivermedcenter.net/api/',
   //baseURL: 'http://192.168.112.100:8090',
   //baseURL: 'http://192.168.112.100:8090',
-  baseURL: 'http://localhost:8090',
+  baseURL: 'http://192.168.70.98:8081/api',
   
   //baseURL: 'http://rmci-testserver/api/',
   //baseURL: 'http://DESKTOP-HKDISKR/api/',

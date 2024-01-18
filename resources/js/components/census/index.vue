@@ -141,10 +141,79 @@
 
                   <table class="table table-striped table-bordered table-sm">
                     <!-- <thead>
-                      <th style="text-align:left" colspan="5">Date</th>
+                      <th class="text-center"></th>
+                      <th class="text-center">LICENSED CAPACITY</th>
+                      <th class="text-center">TARGET CAPACITY</th>
+                      <th class="text-center">MANPOWER HEADCOUNT</th>
+                      <th class="text-center">FUNCTIONAL CAPACITY</th>
+                      <th class="text-center">OCCUPIED CAPACITY</th>
+                      <th class="text-center">MGH</th>
+                      <th class="text-center">RESERVATION</th>
+                      <th class="text-center">ER</th>
+                      <th class="text-center">AVAILABLE</th>
+                      <th class="text-center">RESERVED CAPACITY</th>
                     </thead> -->
                     <thead>
-                      <!-- <th>#</th> -->
+                      <th class="text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                      <th class="text-center">LICENSED CAPACITY</th>
+                      <th class="text-center">TARGET CAPACITY</th>
+                      <th class="text-center">MANPOWER HEADCOUNT</th>
+                      <th class="text-center">FUNCTIONAL CAPACITY</th>
+                      <th class="text-center">OCCUPIED CAPACITY</th>
+                      <th class="text-center">MGH</th>
+                      <th class="text-center">RESERVATION</th>
+                      <th class="text-center">ER</th>
+                      <th class="text-center">AVAILABLE</th>
+                      <th class="text-center">RESERVED CAPACITY</th>
+                      <th class="text-center">RATIO</th>
+                      <th class="text-center">ACTION</th>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td class="text-center" style="width: 6.5%;"><strong>TOTAL</strong></td>
+                        <td class="text-center" style="width: 10.5%;">
+                          <button type="button" class="btn btn-success btn-sm">
+                            {{
+                            totalLicensedCapacity
+                          }}</button>
+                        </td>
+                        <td class="text-center" style="width: 9%;"><button type="button" class="btn btn-success btn-sm">{{ totalTargetCapacity }}</button></td>
+                        <td class="text-center" style="width: 13%;"><button type="button" class="btn btn-success btn-sm">{{ totalManPower }}</button></td>
+                        <td class="text-center" style="width: 11.5%;"><button type="button" class="btn btn-success btn-sm">{{ totalFunctionalCapacity }}</button></td>
+                        <td class="text-center" style="width: 10.5%;"><button type="button" class="btn btn-success btn-sm">{{ totalOccupiedCapacity }}</button></td>
+                        <td class="text-center"><button type="button" class="btn btn-success btn-sm">{{ totalMgh }}</button></td>
+                        <td class="text-center"  style="width: 2%;"><button type="button" class="btn btn-success btn-sm">{{ totalReservation }}</button></td>
+                        <td class="text-center"><button type="button" class="btn btn-success btn-sm">{{ totalEr }}</button></td>
+                        <td class="text-center"  style="width: 4%;"><button type="button" class="btn btn-success btn-sm">{{ totalAvailable }}</button></td>
+                        <td class="text-center"><button type="button" class="btn btn-success btn-sm">{{ totalReseredCapacity }}</button></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <br />
+                  <table class="table table-striped table-bordered table-sm">
+                    <!-- <thead>
+                      <th style="text-align:left" colspan="5">Date</th>
+                    </thead> -->
+                    <colgroup>
+                      <col>
+                      <col class="red1">
+                      <col class="red2">
+                      <col>
+                      <col class="blue">
+                      <col class="success">OCCUPIED CAPACITY
+                      <col class="success">MGH
+                      <col class="success">RESERVATION
+                      <col class="success">ER
+                      <col class="green">
+                      <col class="red1">
+                      <col>
+                      <col>
+                    </colgroup>
+                    
+                    <thead>
                       <th class="text-center">STN</th>
                       <th class="text-center">LICENSED CAPACITY</th>
                       <th class="text-center">TARGET CAPACITY</th>
@@ -161,22 +230,27 @@
                     </thead>
 
                     <tbody>
-                      <tr v-for="(e, index)  in stns">
-                        <!-- <td>{{index+1}}</td> -->
-                        <td class="text-center">{{e.station}}</td>
-                        <td class="text-center">{{e.licensed}}</td>
-                        <td class="text-center">{{e.target}}</td>
-                        <td class="text-center">{{e.manpower}}</td>
-                        <td class="text-center">{{e.functional}}</td>
-                        <td class="text-center">{{e.occupied.census}}</td>
-                        <td class="text-center">{{e.mgh.census}}</td>
-                        <td class="text-center">{{e.reservation}}</td>
-                        <td class="text-center">{{e.er}}</td>
-                        <td class="text-center">{{e.available}}</td>
-                        <td class="text-center">{{e.reserved}}</td>
-                        <td class="text-center">{{e.ratio}}</td>
+                      <tr v-for="(e, index) in stns">
+                        <td class="text-center">{{ e.station }}</td>
+                        <td class="text-center">{{ e.licensed }}</td>
+                        <td class="text-center">{{ e.target }}</td>
+                        <td class="text-center">{{ e.manpower }}</td>
+                        <td class="text-center">{{ e.functional }}</td>
+                        <td class="text-center">{{ e.occupied.census }}</td>
+                        <td class="text-center">{{ e.mgh.census }}</td>
+                        <td class="text-center">{{ e.reservation }}</td>
+                        <td class="text-center">{{ e.er }}</td>
+                        <td class="text-center">{{ e.available }}</td>
+                        <td class="text-center">{{ e.reserved }}</td>
+                        <td class="text-center">{{ e.ratio }}</td>
                         <td>
-                          <button type="button" class="btn btn-primary" @click="updateStatus(e)">UPDATE</button>
+                          <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="updateStatus(e)"
+                          >
+                            UPDATE
+                          </button>
                         </td>
                       </tr>
                     </tbody>
@@ -215,7 +289,7 @@ export default {
   data() {
     return {
       passData: [{}],
-      showModal:false,
+      showModal: false,
       myOptions: ["All"],
       hasError: false,
       isHidden: true,
@@ -239,6 +313,54 @@ export default {
         return e.patientname.match(this.searchTerm);
       });
     },
+    totalLicensedCapacity() {
+      return this.stns.reduce((sum, item) => sum + parseFloat(item.licensed), 0);
+    },
+    totalTargetCapacity() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.target ? item.target : 0),
+        0
+      );
+    },
+    totalManPower() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.manpower ? item.manpower : 0),
+        0
+      );
+    },
+    totalFunctionalCapacity() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.functional ? item.functional : 0),
+        0
+      );
+    },
+    totalOccupiedCapacity() {
+      return this.stns.reduce((sum, item) => sum + parseFloat(item.occupied.census), 0);
+    },
+    totalMgh() {
+      return this.stns.reduce((sum, item) => sum + parseFloat(item.mgh.census), 0);
+    },
+    totalReservation() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.reservation ? item.reservation : 0),
+        0
+      );
+    },
+    totalEr() {
+      return this.stns.reduce((sum, item) => sum + parseFloat(item.er ? item.er : 0), 0);
+    },
+    totalAvailable() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.available ? item.available : 0),
+        0
+      );
+    },
+    totalReseredCapacity() {
+      return this.stns.reduce(
+        (sum, item) => sum + parseFloat(item.reserved ? item.reserved : 0),
+        0
+      );
+    },
   },
   methods: {
     onSelect(value) {
@@ -253,12 +375,12 @@ export default {
         }
       }
     },
-    updateStatus(e){
-        this.showModal = true;
-        this.passData = e;
+    updateStatus(e) {
+      this.showModal = true;
+      this.passData = e;
     },
     getStns() {
-      console.log(1)
+      console.log(1);
       this.stns = [];
       api
         .get("/getStations")
@@ -531,5 +653,25 @@ export default {
 
 .hasDetails {
   box-shadow: 14px 0px 0px 0px #00ce6e inset;
+}
+
+colgroup col.success {
+  background-color: #ffff53;
+}
+
+colgroup col.red1 {
+  background-color: #fdc7b5;
+}
+
+colgroup col.red2 {
+  background-color: #fa9a61;
+}
+
+colgroup col.blue {
+  background-color: #60d5fb;
+}
+
+colgroup col.green {
+  background-color: #b8fbb5;
 }
 </style>

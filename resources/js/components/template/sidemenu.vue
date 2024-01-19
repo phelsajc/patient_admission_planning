@@ -12,7 +12,7 @@
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="info">
-          <user-info></user-info>
+          <!-- <user-info></user-info> -->
         </div>
       </div>
       <nav class="mt-2">
@@ -27,11 +27,23 @@
               <a
                 href="#"
                 class="nav-link"
-                id="revenuemenu"
                 :class="{ active: this.$route.name == 'census' }"
               >
                 <i class="far fa-circle nav-icon"></i>
                 <p>Census</p>
+              </a>
+            </router-link>
+          </li>
+
+          <li class="nav-item">
+            <router-link to="/daily_census" class="collapse-item">
+              <a
+                href="#"
+                class="nav-link"
+                :class="{ active: this.$route.name == 'daily_census' }"
+              >
+                <i class="far fa-circle nav-icon"></i>
+                <p>Daily Census</p>
               </a>
             </router-link>
           </li>

@@ -8,12 +8,13 @@ let userslist = require('./components/users/index.vue').default
 let usersadd = require('./components/users/create.vue').default
 let er_list = require('./components/er/index.vue').default
 let er_report = require('./components/er/report.vue').default
-
+let daily_census = require('./components/census/daily.vue').default
 export const routes = [
     { path: '/', component: login, name: '/' },
     { path: '/logout', component: logout, name: 'forget' },
     //{ path: '/home', component: home, name: 'home' },
     { path: '/census', component: census, name: 'census' },
+    { path: '/daily_census', component: daily_census, name: 'daily_census' },
     { path: '/userslist', component: userslist, name: 'userslist' },
     { path: '/usersadd/:id', component: usersadd, name: 'usersadd' },
     { path: '/er_list', component: er_list, name: 'er_list' },

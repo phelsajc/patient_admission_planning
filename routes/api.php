@@ -20,10 +20,11 @@ Route::group([
 
 Route::match(['get','post'],'getStations','CensusController@getStations');
 Route::match(['get','post'],'update-stn-census','CensusController@UpdateInfo');
-Route::match(['get','post'],'er_list','CensusController@getErList');
+Route::match(['get','post'],'daily-census','CensusController@daily_census');
+/* Route::match(['get','post'],'er_list','CensusController@getErList');
 Route::match(['get','post'],'getEeReport','CensusController@getEeReport');
 Route::match(['get','post'],'store-acuity','CensusController@storeAcuityInfo');
-Route::match(['get','post'],'patients-find','CensusController@patientsFind');
+Route::match(['get','post'],'patients-find','CensusController@patientsFind'); */
 
 
 Route::match(['get','post'],'addusers','UserController@registerUser');

@@ -78,17 +78,6 @@ return [
         ],
 
         
-        'peds' => array(
-            'driver'   => 'pgsql',
-            'host'     => '192.168.70.99',
-            'database' => 'peds',
-            'username' => 'postgres',
-            'password' => 'pgadmin888!?',
-            'charset'  => 'utf8',
-            'prefix'   => '',
-            'schema'   => 'public',
-        ),
-        
         'bizbox_uk' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST_SQLSRV', '192.168.7.2'),
@@ -113,11 +102,11 @@ return [
             'prefix_indexes' => true,
         ],
 
-        'peds_uk' => array(
+        'rmci_census_monitoring' => array(
             'driver'   => 'pgsql',
-            'host'     => '192.168.70.99',
+            'host'     => '192.168.70.90',
             //'database' => 'peds',
-            'database' => 'peds_uk',
+            'database' => 'rmci_census_monitoring',
             'username' => 'postgres',
             'password' => 'pgadmin888!?',
             'charset'  => 'utf8',

@@ -39,7 +39,7 @@ class CensusController extends Controller
             $returnStn[] = $arr;
         }
         $datasets["data"] = $returnStn;
-        $datasets["data2"] = $this->daily_census();
+        //$datasets["data2"] = $this->daily_census();
         return response()->json($datasets);
     }
 
@@ -62,11 +62,17 @@ class CensusController extends Controller
         $formula1 = $totalDailyTarget - $dailyTarget;
         $formula2 = $formula1;
 
+        $targetDailyCensusArr = array();
+        $simulatedActualArr = array();
+        $newTargetDailyCensusArr = array();
+        $daysArr = array();
+
         //$simulatedActual = $this->getDailyCensus($YrDt."-1",$YrDt."-1");//154;
         
         /* $actual_formula1 = $totalDailyTarget-$simulatedActual;
         $actual_formula2 = $actual_formula1; */
         $actual_formula2 = 0;
+        $getLastNewTarget = 0;
         for ($i = 1; $i <= $date->format("t"); $i++) {
             $simulatedActual = $this->getDailyCensus($YrDt . "-" . $i, $YrDt . "-" . $i); //154;
             $actual_formula1 = $totalDailyTarget - $simulatedActual;
@@ -78,25 +84,54 @@ class CensusController extends Controller
             $ac = $i == 1 && $simulatedActual > 0 ? $actual_formula1 : $actual_formula2;
             $nt = $d > 0 ? $ac / $d : 0;
             $arr = array();
+            //$newTargetValue = $simulatedActual == 0 ? $dailyTarget : round($nt);
+            $newTargetValue = $simulatedActual == 0 ? $dailyTarget : round($nt);
             $arr['day'] = date('l', strtotime($current_year . "-" . $getDate . "-" . $i));
             $arr['date'] = $i;
             $arr['dateF'] = DateTime::createFromFormat("Y-n-d", $YrDt . "-$i")->format("Y-m-d");
             $arr['target'] = $dailyTarget;
             $arr['actual'] = $simulatedActual;
-            $arr['new_target'] = $simulatedActual == 0 ? $dailyTarget : round($nt);
+           // $arr['new_target'] = $newTargetValue;//$simulatedActual == 0 ? $dailyTarget : round($nt);
             $arr['req_daily_census'] = round($nt);
-            $arr['target_balance'] = $i == 1 ? $formula1 : $formula2;
+            $trgt = $i == 1 ? $formula1 : $formula2;
+            $arr['target_balance'] = $trgt;
             $arr['actual_balance'] = $ac;
+            $arr['var'] = $trgt-$ac;
             $formula2 -= $dailyTarget;
             $actual_formula2 -= $simulatedActual;
+            $targetDailyCensusArr[] = $dailyTarget;
+            $simulatedActualArr[] = $simulatedActual;
+            $newTargetDailyCensusArr[] = $newTargetValue;
+            $daysArr[] = $i;
+            
+            $getLastNewTarget = $simulatedActual==0 ? $getLastNewTarget : $newTargetValue ;
+            $arr['getLastNewTarget'] = $getLastNewTarget;
+            $arr['new_target'] = $getLastNewTarget;
             $datesArray[] = $arr;
+            /* if($simulatedActual==0){
+                $dailyTarget = $newTargetValue;
+            } */
         }
         $datasets["data"] = $datesArray;
         $datasets["getYr"] = $getYr;
         $datasets["getDate"] = $getDate;
-        $datasets["fulldt"] = date_format(date_create($request->fdate), 'Y-m-d');
-        $datasets["t"] = $date->format("t");
-        $datasets["t"] = $date;
+        $datasets["targetDailyCensusArr"] = $targetDailyCensusArr;
+        $datasets["simulatedActualArr"] = $simulatedActualArr;
+        $datasets["newTargetDailyCensusArr"] = $newTargetDailyCensusArr;
+        $datasets["series"] = array([
+            "name" => 'Target Daily Census', 
+            "type"=> "column", 
+            "data" => $targetDailyCensusArr
+        ],[
+            "name" => 'Simulated Actual', 
+            "type"=> "column", 
+            "data" => $simulatedActualArr
+        ],[
+            "name" => 'New Target Daily', 
+            "type"=> "line", 
+            "data" => $newTargetDailyCensusArr
+        ]);
+        $datasets["daysArr"] = $daysArr;
 
         //return $datesArray;//response()->json($month_arr);
         return response()->json($datasets);
@@ -106,29 +141,29 @@ class CensusController extends Controller
     {
         switch ($month) {
             case 1:
-                return 153;
+                return 157;
             case 2:
-                return 134;
+                return 139;
             case 3:
-                return 147;
+                return 151;
             case 4:
-                return 149;
+                return 154;
             case 5:
-                return 153;
+                return 159;
             case 6:
-                return 166;
-            case 7:
-                return 155;
-            case 8:
-                return 169;
-            case 9:
                 return 170;
+            case 7:
+                return 160;
+            case 8:
+                return 174;
+            case 9:
+                return 175;
             case 10:
-                return 155;
+                return 160;
             case 11:
-                return 169;
+                return 173;
             default:
-                return 166;
+                return 171;
             //code block
         }
     }
@@ -148,7 +183,7 @@ class CensusController extends Controller
             $stnArrToStr .= "'" . $valueStn->station . "',";
         }
         $sql_q = substr($stnArrToStr, 0, -1);
-        $data = DB::connection('pgsql')->select("SELECT station from census where station in ($sql_q)  group by station");
+        $data = DB::connection('rmci_census_monitoring')->select("SELECT station from census where station in ($sql_q)  group by station");
         //$data = DB::connection('rmci_census_monitoring')->select("SELECT count(station) as totalstn,station,created_dt from census group by station,created_dt LIMIT $length");
 
         $totalRegularBed = 0;

@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+      <Loading :active="isLoading"></Loading>
     <navComponent></navComponent>
     <sidemenuComponent></sidemenuComponent>
     <div class="content-wrapper">
@@ -53,6 +54,19 @@
                     </div>
                   </form>
                   <table class="table table-striped table-bordered table-sm">
+                    <colgroup>
+                      <col />
+                      <col />
+                      <col />
+                      <col class="success" />
+                      SIMULATED ACTUAL
+                      <col />
+                      <col />
+                      <col />
+                      <col />
+                      <col />
+                    </colgroup>
+
                     <thead>
                       <th class="text-center">Day</th>
                       <th class="text-center">Date</th>
@@ -61,22 +75,45 @@
                       <th class="text-center">NEW TARGET DAILY CENSUS</th>
                       <th class="text-center">REQUIRED DAILY CENSUS</th>
                       <th class="text-center">TARGET BALANCE</th>
-                      <th class="text-center">ACTUAL BALance</th>
+                      <th class="text-center">ACTUAL BALANCE</th>
+                      <th class="text-center">VAR</th>
                     </thead>
 
                     <tbody>
-                      <tr v-for="(e, index) in stns">
+                      <tr
+                        v-for="(e, index) in stns"
+                        :class="
+                          e.day == 'Sunday' || e.day == 'Saturday' ? 'bg_color' : ''
+                        "
+                      >
                         <td class="text-center">{{ e.day }}</td>
                         <td class="text-center">{{ e.date }}</td>
                         <td class="text-center">{{ e.target }}</td>
-                        <td class="text-center">{{ e.actual }}</td>
+                        <td
+                          :class="
+                            e.day == 'Sunday' || e.day == 'Saturday' ? 'bg_colorY' : ''
+                          "
+                          class="text-center"
+                        >
+                          {{ e.actual }}
+                        </td>
                         <td class="text-center">{{ e.new_target }}</td>
                         <td class="text-center">{{ e.req_daily_census }}</td>
                         <td class="text-center">{{ e.target_balance }}</td>
                         <td class="text-center">{{ e.actual_balance }}</td>
+                        <td class="text-center">{{ e.var }}</td>
                       </tr>
                     </tbody>
                   </table>
+
+                  <div id="chart">
+                    <apexchart
+                      type="line"
+                      height="350"
+                      :options="chartOptions"
+                      :series="series"
+                    ></apexchart>
+                  </div>
                 </div>
               </div>
             </div>
@@ -93,17 +130,28 @@ import Datepicker from "vuejs-datepicker";
 import Select2 from "v-select2-component";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
+import VueApexCharts from "vue-apexcharts";
+import Loading from "vue-loading-overlay";
+
 export default {
-  components: { Datepicker, Select2, Multiselect },
+  components: {
+    Datepicker,
+    Select2,
+    Multiselect,
+    apexchart: VueApexCharts,
+    Loading,
+  },
   created() {
     if (!User.loggedIn()) {
       this.$router.push({ name: "/" });
     }
-
-    this.getStns();
   },
   data() {
     return {
+      isLoading: true,
+      fullPage: true,
+      color: "#ffff53",
+      loading: true,
       passData: [{}],
       showModal: false,
       myOptions: ["All"],
@@ -119,88 +167,78 @@ export default {
       showing: "",
       getTotalBeds: 0,
       census_results: [],
+      getNewTargetArray: [],
+      getsimulatedArray: [],
+      gettargetDailyArray: [],
+      dateArray: [],
+      series: [
+        /* {
+          name: "Target Daily Census",
+          type: "column",
+          data: [10, 19, 27, 26, 34, 35, 40, 38],//this.getNewTargetArray,
+        },
+        {
+          name: "Simulated Actual",
+          type: "column",
+          data: [10, 19, 27, 26, 34, 35, 40, 38],//this.getsimulatedArray,
+        },
+        {
+          name: "New Target Daily",
+          type: "line",
+          data: [10, 19, 27, 26, 34, 35, 40, 38],//this.gettargetDailyArray,
+        }, */
+      ],
+      chartOptions: {
+        chart: {
+          height: 350,
+        },
+        colors: ["#050cf3", "#f49122", "#fc1425"],
+        stroke: {
+          width: [0, 4, 2],
+        },
+        title: {
+          text: "Daily Census",
+        },
+        /* dataLabels: {
+          enabled: true,
+          enabledOnSeries: [0,1,2],
+        }, */
+        labels: this.dateArray,
+        /* xaxis: {
+          type: "datetime",
+        }, */
+        yaxis: [
+          /* {
+            title: {
+              text: "Website Blog",
+            },
+          }, */
+          /*  {
+            opposite: true,
+            title: {
+              text: "Social Media",
+            },
+          }, */
+        ],
+      },
     };
   },
-  computed: {
-    filtersearch() {
-      return this.employees.filter((e) => {
-        return e.patientname.match(this.searchTerm);
-      });
-    },
-    totalLicensedCapacity() {
-      return this.stns.reduce((sum, item) => sum + parseFloat(item.licensed), 0);
-    },
-    totalTargetCapacity() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.target ? item.target : 0),
-        0
-      );
-    },
-    totalManPower() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.manpower ? item.manpower : 0),
-        0
-      );
-    },
-    totalFunctionalCapacity() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.functional ? item.functional : 0),
-        0
-      );
-    },
-    totalOccupiedCapacity() {
-      return this.stns.reduce((sum, item) => sum + parseFloat(item.occupied.census), 0);
-    },
-    totalMgh() {
-      return this.stns.reduce((sum, item) => sum + parseFloat(item.mgh.census), 0);
-    },
-    totalReservation() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.reservation ? item.reservation : 0),
-        0
-      );
-    },
-    totalEr() {
-      return this.stns.reduce((sum, item) => sum + parseFloat(item.er ? item.er : 0), 0);
-    },
-    totalAvailable() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.available ? item.available : 0),
-        0
-      );
-    },
-    totalReseredCapacity() {
-      return this.stns.reduce(
-        (sum, item) => sum + parseFloat(item.reserved ? item.reserved : 0),
-        0
-      );
-    },
-  },
   methods: {
-    onSelect(value) {
-      if (value == "All") {
-        console.log(value);
-        this.filter.stns = [];
-        this.filter.stns = ["All"];
-      } else {
-        var index = this.filter.stns.indexOf("All");
-        if (index !== -1) {
-          this.filter.stns.splice(index, 1);
-        }
-      }
-    },
-    updateStatus(e) {
-      this.showModal = true;
-      this.passData = e;
-    },
-    getStns() {
-      api
+    async getStns() {
+      await api
         .get("/daily-census")
         .then((response) => {
+          this.series = [];
           this.stns = [];
           response.data.data.forEach((element) => {
             this.stns.push(element);
           });
+          this.series = response.data.series;
+          this.chartOptions = {
+            xaxis: {
+              categories: response.data.daysArr,
+            },
+          };
         })
         .catch((error) => console.log(error));
     },
@@ -214,13 +252,20 @@ export default {
         api
           .post("/daily-census", this.filter)
           .then((response) => {
-          this.stns = [];
-          response.data.data.forEach((element) => {
-            this.stns.push(element);
-          });
+            this.stns = [];
+            this.series = [];
+            response.data.data.forEach((element) => {
+              this.stns.push(element);
+            });
+            this.series = response.data.series;
+            this.chartOptions = {
+              xaxis: {
+                categories: response.data.daysArr,
+              },
+            };
             Toast.fire({
               icon: "success",
-              title: "Saved successfully",
+              title: "Generated successfully",
             });
           })
           .catch((error) => {
@@ -234,119 +279,10 @@ export default {
           });
       }
     },
-    generate() {
-      console.log(this.myValue);
-    },
-    myChangeEvent(val) {
-      console.log(val);
-    },
-    mySelectEvent({ id, text }) {
-      console.log({ id, text });
-    },
-    allEmployee() {
-      this.isHidden = false;
-      axios
-        .get("/api/patientEmployee")
-        .then(
-          ({ data }) => (
-            (this.employees = data[0].data),
-            (this.countRecords = data[0].count),
-            (this.showing = data[0].showing),
-            (this.isHidden = true)
-          )
-        )
-        .catch();
-    },
-    async check_doctors_detail(id) {
-      return await axios.get("/api/check_doctors_detail/" + id).then((response) => {
-        setTimeout(function () {
-          return response.data;
-        }, 3000);
-      });
-      /*  .then((response) => {  
-                return  Promise.resolve(response.data); }) */
-    },
-    /* async  check_doctors_detail(id) {   
-             return await axios.get( '/api/check_doctors_detail/'+id)
-            }, */
-    formatDate(date) {
-      const options = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(date).toLocaleDateString("en", options);
-    },
-    deleteRecord(id) {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios
-            .delete("/api/employee/" + id)
-            .then(() => {
-              this.employees = this.employees.filter((e) => {
-                return e.id != id;
-              });
-            })
-            .catch(() => {
-              //this.$router.push({name: 'all_employee'})
-              this.$router.push("/all_employee").catch(() => {});
-            });
-
-          Swal.fire("Deleted!", "Your file has been deleted.", "success");
-        }
-      });
-    },
-    filterEmployee() {
-      this.employees = [];
-      this.countRecords = null;
-      this.form.start = 0;
-      this.isHidden = false;
-      //axios.post('/api/filterEmployee',this.form)
-      axios
-        .post("/api/patientEmployee", this.form)
-
-        .then((res) => {
-          this.employees = res.data[0].data;
-          this.countRecords = res.data[0].count;
-          console.log(res.data.data);
-          this.isHidden = true;
-        })
-        .catch((error) => (this.errors = error.response.data.errors));
-    },
-    getPageNo(id) {
-      this.form.start = (id - 1) * 10;
-      this.isHidden = false;
-      //alert(a)
-      /* this.employees = []
-              this.countRecords = null */
-      //axios.post('/api/filterEmployee',this.form)
-
-      axios
-        .post("/api/patientEmployee", this.form)
-        .then((res) => {
-          this.employees = res.data[0].data;
-          this.countRecords = res.data[0].count;
-          (this.showing = res.data[0].showing), console.log(res.data[0]);
-          this.isHidden = true;
-        })
-        .catch((error) => (this.errors = error.response.data.errors));
-    },
-
-    download(ppspat, ddoctor) {
-      window.open("/api/print_prescription/" + ppspat + "/" + ddoctor);
-    },
   },
-  /* mounted () {
-          axios.get('/api/check_doctors_detail/'+id)
-              .then(response => (this.getdctr = response))
-        }, */
-  /* created(){
-            this.allEmployee();
-        } */
+  mounted() {
+    this.getStns();
+  },
 };
 </script>
 
@@ -478,5 +414,15 @@ colgroup col.blue {
 
 colgroup col.green {
   background-color: #b8fbb5;
+}
+
+.bg_color {
+  background-color: #ff5151 !important;
+  color: white;
+}
+
+.bg_colorY {
+  background-color: #ffff53 !important;
+  color: black;
 }
 </style>

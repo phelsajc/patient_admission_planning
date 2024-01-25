@@ -192,7 +192,7 @@ export default {
         chart: {
           height: 350,
         },
-        colors: ["#050cf3", "#f49122", "#fc1425"],
+        colors: ["#050cf3", "#f49122", "#fc1425", "#00bb00"],
         stroke: {
           width: [0, 4, 2],
         },
@@ -204,10 +204,15 @@ export default {
           enabledOnSeries: [0,1,2],
         }, */
         labels: this.dateArray,
+        yaxis: {
+        max: 250,
+        min: 100
+    }
         /* xaxis: {
-          type: "datetime",
+          type: "dat
+          etime",
         }, */
-        yaxis: [
+       // yaxis: [
           /* {
             title: {
               text: "Website Blog",
@@ -219,7 +224,7 @@ export default {
               text: "Social Media",
             },
           }, */
-        ],
+        //],
       },
     };
   },

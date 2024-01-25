@@ -73,6 +73,8 @@ class CensusController extends Controller
         $actual_formula2 = $actual_formula1; */
         $actual_formula2 = 0;
         $getLastNewTarget = 0;
+        $simulatedActualAvg = 0;
+        $simulatedActualAvgArr = array();
         for ($i = 1; $i <= $date->format("t"); $i++) {
             $simulatedActual = $this->getDailyCensus($YrDt . "-" . $i, $YrDt . "-" . $i); //154;
             $actual_formula1 = $totalDailyTarget - $simulatedActual;
@@ -91,6 +93,10 @@ class CensusController extends Controller
             $arr['dateF'] = DateTime::createFromFormat("Y-n-d", $YrDt . "-$i")->format("Y-m-d");
             $arr['target'] = $dailyTarget;
             $arr['actual'] = $simulatedActual;
+            $simulatedActualAvg+=$simulatedActual;
+            if($simulatedActual!=0){
+                $simulatedActualAvgArr[] = round($simulatedActualAvg/$i);
+            }
            // $arr['new_target'] = $newTargetValue;//$simulatedActual == 0 ? $dailyTarget : round($nt);
             $arr['req_daily_census'] = round($nt);
             $trgt = $i == 1 ? $formula1 : $formula2;
@@ -112,6 +118,7 @@ class CensusController extends Controller
                 $dailyTarget = $newTargetValue;
             } */
         }
+        $datasets["calcAvg"] = $simulatedActualAvgArr;
         $datasets["data"] = $datesArray;
         $datasets["getYr"] = $getYr;
         $datasets["getDate"] = $getDate;
@@ -130,6 +137,10 @@ class CensusController extends Controller
             "name" => 'New Target Daily', 
             "type"=> "line", 
             "data" => $newTargetDailyCensusArr
+        ],[
+            "name" => 'Simulated Actual Avg', 
+            "type"=> "line", 
+            "data" => $simulatedActualAvgArr
         ]);
         $datasets["daysArr"] = $daysArr;
 
